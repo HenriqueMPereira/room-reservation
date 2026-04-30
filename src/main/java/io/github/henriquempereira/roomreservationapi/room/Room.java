@@ -1,6 +1,7 @@
 package io.github.henriquempereira.roomreservationapi.room;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
@@ -24,13 +25,13 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
-    @NotNull(message = "A sala deve ter um nome.")
+    @NotBlank(message = "A sala deve ter um nome.")
     @Column(name = "name")
     private String roomName;
 
     @NotNull(message = "Capacidade é obrigatória.")
     @Positive(message = "Capacidade deve ser positiva.")
-    private int capacity;
+    private Integer capacity;
 
     @NotNull(message = "A sala deve ter status 'ATIVA' ou 'INATIVA'.")
     @Column(name = "status")
