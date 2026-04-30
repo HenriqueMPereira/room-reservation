@@ -1,6 +1,7 @@
 package io.github.henriquempereira.roomreservationapi.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
@@ -24,11 +25,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @NotNull(message = "Usuário deve ter um nome.")
+    @NotBlank(message = "Usuário deve ter um nome.")
     @Column(name = "name")
     private String userName;
 
     @CPF(message = "Usuário deve ter um CPF válido.")
-    @NotNull(message = "Usuário deve ter um CPF.")
+    @NotBlank(message = "Usuário deve ter um CPF.")
     private String cpf;
 }
