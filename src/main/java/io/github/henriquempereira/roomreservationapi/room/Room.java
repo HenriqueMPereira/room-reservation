@@ -26,7 +26,7 @@ public class Room {
     private long id;
 
     @NotBlank(message = "A sala deve ter um nome.")
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String roomName;
 
     @NotNull(message = "Capacidade é obrigatória.")
