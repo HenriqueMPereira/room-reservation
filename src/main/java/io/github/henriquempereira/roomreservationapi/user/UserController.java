@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UserRequest request,@PathVariable Long id) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
         UserResponse response = userService.updateUser(id, request);
         return ResponseEntity.ok(response);
     }

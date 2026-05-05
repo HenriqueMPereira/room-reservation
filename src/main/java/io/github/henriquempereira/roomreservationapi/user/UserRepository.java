@@ -1,0 +1,8 @@
+package io.github.henriquempereira.roomreservationapi.user;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    boolean existsByCpf(String cpf);
+}
