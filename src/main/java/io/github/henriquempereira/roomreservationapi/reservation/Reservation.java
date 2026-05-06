@@ -29,9 +29,11 @@ public class Reservation {
     private Long id;
 
     @NotNull(message = "A reserva deve ter um horário de início.")
+    @Column(name = "start_time")
     private LocalDateTime start;
 
     @NotNull(message = "A reserva deve ter um horário de fim.")
+    @Column(name = "end_time")
     private LocalDateTime end;
 
     @ManyToOne(fetch = FetchType.LAZY)

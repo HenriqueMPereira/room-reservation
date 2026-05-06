@@ -19,6 +19,7 @@ import org.hibernate.validator.constraints.br.CPF;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@Table(name = "users")
 public class User {
 
     @Id
