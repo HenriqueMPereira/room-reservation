@@ -1,6 +1,9 @@
 package io.github.henriquempereira.roomreservationapi.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +14,7 @@ public class UserService {
 
     private final UserRepository repository;
 
+    @Transactional
     public UserResponse createUser(UserRequest request) {
         if(repository.existsByCpf(request.cpf())){
             throw new IllegalArgumentException("Já existe usuário cadastrado com este CPF!");
@@ -23,10 +27,9 @@ public class UserService {
         return toResponse(userSaved);
     }
 
-    public List<UserResponse> getAllUsers() {
-        return repository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     public UserResponse getUserById(Long id) {
@@ -34,6 +37,7 @@ public class UserService {
         return toResponse(user);
     }
 
+    @Transactional
     public UserResponse updateUser(Long id, UserRequest request) {
         User user = getUserOrThrow(id);
         user.setUserName(request.name());
@@ -43,6 +47,7 @@ public class UserService {
         return toResponse(userSaved);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         User user = getUserOrThrow(id);
         repository.delete(user);

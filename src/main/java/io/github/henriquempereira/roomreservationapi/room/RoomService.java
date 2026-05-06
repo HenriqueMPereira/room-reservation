@@ -1,9 +1,10 @@
 package io.github.henriquempereira.roomreservationapi.room;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -11,6 +12,7 @@ public class RoomService {
 
     private final RoomRepository repository;
 
+    @Transactional
     public RoomResponse createRoom(RoomRequest request) {
         if(repository.existsByRoomName(request.name())){
             throw new IllegalArgumentException("Já existe uma sala cadastrada com este nome");
@@ -18,16 +20,15 @@ public class RoomService {
         Room room = new Room();
         room.setRoomName(request.name());
         room.setCapacity(request.capacity());
-
+        room.setRoomStatus(request.status());
         Room savedRoom = repository.save(room);
 
         return toResponse(savedRoom);
     }
 
-    public List<RoomResponse> getAllRooms() {
-        return repository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<RoomResponse> getAllRooms(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     public RoomResponse getRoomById(Long id) {
@@ -35,6 +36,7 @@ public class RoomService {
         return toResponse(room);
     }
 
+    @Transactional
     public RoomResponse updateRoom(Long id, RoomRequest request) {
         Room room = getRoomOrThrow(id);
 
@@ -49,6 +51,7 @@ public class RoomService {
         return toResponse(savedRoom);
     }
 
+    @Transactional
     public void deleteRoomById(Long id) {
         Room room = getRoomOrThrow(id);
         room.setRoomStatus(RoomStatus.INATIVA);

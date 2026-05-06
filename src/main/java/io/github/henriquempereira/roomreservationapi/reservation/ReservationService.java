@@ -6,9 +6,10 @@ import io.github.henriquempereira.roomreservationapi.room.RoomSummaryResponse;
 import io.github.henriquempereira.roomreservationapi.user.User;
 import io.github.henriquempereira.roomreservationapi.user.UserRepository;
 import io.github.henriquempereira.roomreservationapi.user.UserSummaryResponse;
-import jakarta.validation.Valid;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public class ReservationService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
-
+    @Transactional
     public ReservationResponse createReservation(ReservationRequest request) {
         validateDates(request.start(), request.end());
 
@@ -31,7 +32,7 @@ public class ReservationService {
         User user = userRepository.findById(request.user().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado!"));
 
-        if(reservationRepository.hasOverlap(request.room().getId(), request.start(), request.end())) {
+        if(reservationRepository.hasOverlap(request.room().getId(), request.start(), request.end(), ReservationStatus.ATIVA)) {
             throw new IllegalArgumentException("A sala já possui reserva neste horário.");
         }
 
@@ -45,10 +46,9 @@ public class ReservationService {
         return toResponse(savedReservation);
     }
 
-    public List<ReservationResponse> getAllReservations() {
-        return reservationRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<ReservationResponse> getAllReservations(Pageable pageable) {
+        return reservationRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     public ReservationResponse getReservationById(Long id) {
@@ -56,6 +56,7 @@ public class ReservationService {
         return toResponse(reservation);
     }
 
+    @Transactional
     public ReservationResponse updateReservation(Long id, ReservationRequest request) {
         validateDates(request.start(), request.end());
         Room room = roomRepository.findById(request.room().getId())
@@ -63,7 +64,7 @@ public class ReservationService {
         User user = userRepository.findById(request.user().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado!"));
 
-        if(reservationRepository.hasOverlapIgnoringId(room.getId(), request.start(), request.end(), id)){
+        if(reservationRepository.hasOverlapIgnoringId(room.getId(), request.start(), request.end(), id, ReservationStatus.ATIVA)){
             throw new IllegalArgumentException("A sala já possui reserva neste horário.");
         }
         Reservation reservation = getReservationOrThrow(id);
@@ -76,6 +77,7 @@ public class ReservationService {
         return toResponse(savedReservation);
     }
 
+    @Transactional
     public void cancelReservation(Long id) {
         Reservation reservation = getReservationOrThrow(id);
         reservation.cancelReservation();
