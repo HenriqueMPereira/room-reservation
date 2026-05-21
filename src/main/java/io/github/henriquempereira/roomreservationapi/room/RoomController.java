@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/rooms")
 @RequiredArgsConstructor
@@ -42,7 +40,7 @@ public class RoomController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoomById (@PathVariable Long id) {
-        roomService.deleteRoomById(id);
+        roomService.deactivateRoomById(id);
         return ResponseEntity.noContent().build();
     }
 }

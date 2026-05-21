@@ -41,7 +41,7 @@ public class RoomService {
         Room room = getRoomOrThrow(id);
 
         if (!room.getRoomName().equals(request.name()) && repository.existsByRoomName(request.name())) {
-            throw new IllegalArgumentException("Já existe uma sala cadastrada com este nome.");
+            throw new IllegalArgumentException("Já existe uma sala cadastrada com este nome");
         }
 
         room.setRoomName(request.name());
@@ -52,8 +52,11 @@ public class RoomService {
     }
 
     @Transactional
-    public void deleteRoomById(Long id) {
+    public void deactivateRoomById(Long id) {
         Room room = getRoomOrThrow(id);
+        if(room.getRoomStatus() == RoomStatus.INATIVA){
+            throw new IllegalArgumentException("Sala já está inativa");
+        }
         room.setRoomStatus(RoomStatus.INATIVA);
         repository.save(room);
     }
