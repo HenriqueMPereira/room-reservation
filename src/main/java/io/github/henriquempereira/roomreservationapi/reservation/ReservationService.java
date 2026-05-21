@@ -13,8 +13,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+/**
+ * Suíte de testes unitários para a classe {@link ReservationService}.
+ * <p>
+ * Valida as regras de negócio de criação, atualização e cancelamento de reservas,
+ * garantindo o isolamento das dependências através de mocks.
+ * </p>
+ * <p>
+ * Principais cenários cobertos:
+ * <ul>
+ * <li>Validação de integridade de datas (início vs. fim).</li>
+ * <li>Prevenção de sobreposição de horários (hasOverlap e hasOverlapIgnoringId).</li>
+ * <li>Tratamento de entidades não encontradas (Room, User, Reservation).</li>
+ * </ul>
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -27,12 +41,12 @@ public class ReservationService {
     public ReservationResponse createReservation(ReservationRequest request) {
         validateDates(request.start(), request.end());
 
-        Room room = roomRepository.findById(request.room().getId())
+        Room room = roomRepository.findById(request.roomId())
                 .orElseThrow(() -> new IllegalArgumentException("Sala não encontrada!"));
-        User user = userRepository.findById(request.user().getId())
+        User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado!"));
 
-        if(reservationRepository.hasOverlap(request.room().getId(), request.start(), request.end(), ReservationStatus.ATIVA)) {
+        if(reservationRepository.hasOverlap(request.roomId(), request.start(), request.end(), ReservationStatus.ATIVA)) {
             throw new IllegalArgumentException("A sala já possui reserva neste horário.");
         }
 
@@ -59,9 +73,9 @@ public class ReservationService {
     @Transactional
     public ReservationResponse updateReservation(Long id, ReservationRequest request) {
         validateDates(request.start(), request.end());
-        Room room = roomRepository.findById(request.room().getId())
+        Room room = roomRepository.findById(request.roomId())
                 .orElseThrow(() -> new IllegalArgumentException("Sala não encontrada!"));
-        User user = userRepository.findById(request.user().getId())
+        User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado!"));
 
         if(reservationRepository.hasOverlapIgnoringId(room.getId(), request.start(), request.end(), id, ReservationStatus.ATIVA)){

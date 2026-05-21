@@ -13,5 +13,5 @@ public record RoomRequest(
         Integer capacity,
 
         @NotNull(message = "O status da sala é obrigatório")
-        RoomStatus status // <-- Adicionamos o campo aqui!
+        RoomStatus status
 ){}
